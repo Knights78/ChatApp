@@ -17,7 +17,7 @@ const io = new Server(server, {
 const onlineUser = new Set(); // in set every online user id will be different
 
 io.on('connection', async (socket) => { // whenever any user will be connected
-    console.log('connect user', socket.id);
+   // console.log('connect user', socket.id);
     const token = socket.handshake.auth.token;
     const user = await getUserDetailsFromToken(token);
 
