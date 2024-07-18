@@ -4,6 +4,7 @@ const http = require('http');
 const getUserDetailsFromToken = require('../helpers/getUserDetailsFromToken');
 const userModel = require('../models/User');
 const { conversationModel, messageModel } = require('../models/Conversation');
+const getConversation = require('../helpers/getConversation');
 
 const app = express();
 const server = http.createServer(app);
@@ -46,7 +47,7 @@ io.on('connection', async (socket) => { // whenever any user will be connected
             ]
         }).populate('messages').sort({ updateAt: -1 }); // populate method is used to render the collection in our case we are passing the messages from the conversation
 
-        socket.emit('message', getConversation.messages || []);
+        socket.emit('message',getConversation.messages || []);
     });
 
     socket.on('new message', async (data) => {
@@ -89,6 +90,15 @@ io.on('connection', async (socket) => { // whenever any user will be connected
         io.to(data?.sender).emit('message', getConversationMessage?.messages || []);
         io.to(data?.receiver).emit('message', getConversationMessage?.messages || []);
     });
+
+    socket.on('sidebar',async(currentUserId)=>{
+        console.log('current user',currentUserId)
+
+        const conversation= await getConversation(currentUserId)
+        socket.emit('conversation',conversation)
+
+       
+    })
 
     socket.on('disconnect', () => {
         onlineUser.delete(user?._id); // on disconnection delete that user
